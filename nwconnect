@@ -1,0 +1,32 @@
+#!/bin/sh
+
+interface=wlp3s0
+profile=$(ls /etc/netctl | dmenu -i -l 15)
+
+if [ -z ${profile} ] 
+then
+    notify-send 'No profile selected!'
+    exit 1
+fi
+
+if [ -e /etc/netctl/"${profile}" ]
+then
+    sudo rfkill unblock wifi
+
+    sudo rm -v "/run/wpa_supplicant-${interface}.pid" "/run/wpa_supplicant/${interface}" "/run/wpa_supplicant/p2p-dev-${interface}"
+
+    sudo systemctl restart netctl
+
+	sudo ip link set $interface down
+
+	sudo netctl switch-to "${profile}"
+	#sudo netctl start "${profile}"
+
+	#sudo netctl start "${profile}"
+	
+	# TODO: Self terminate schedule
+    watch -gn0.1 ip addr && notify-send 'Connection established!'
+else
+    notify-send 'Profile ${profile} not found!'
+	exit 1
+fi

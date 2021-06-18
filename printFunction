@@ -1,0 +1,25 @@
+#!/bin/sh
+
+#############################################
+#   Print functions of a C/C++ program      #
+#############################################
+
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+LCYAN='\033[1;36m'
+NC='\033[0m' # No Color
+
+for file in "$@"; do
+    #functions=$(sed -rn "s/^(\w+.*\(.*\))/\1/gp" "$file")
+    functions=$(cat ${file} | nl | sed -rn "s/^(    [0-9]+\t\w+.*\(.*\))/\1/gp")
+    if [ ! -z "$functions" ]
+    then
+        echo -e "${GREEN}#####     $file      #####"
+        echo -en ${NC}
+        echo "$functions"
+    else
+        echo -e "  ${LCYAN}Ignoring: $file"
+    fi
+    #out=$(sed -rn "s/^(\w+.*\(.*\) )\{/\1/gp" "$file") # Check for `{`, not necessary?
+    echo
+done
